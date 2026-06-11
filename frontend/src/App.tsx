@@ -5,10 +5,10 @@ function App() {
   // --- STATE ---
   const [candidates, setCandidates] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [allRankings, setAllRankings] = useState<any>({}); // { jobId: { candidates: [], isDemo: bool } }
   const [jobDescription, setJobDescription] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [selectedJobId, setSelectedJobId] = useState('');
-  const [storedJobId, setStoredJobId] = useState<string | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [weights, setWeights] = useState({ motivation: 1, stability: 1, personality: 1, problem_approach: 1, teamwork: 1 });
   const [filterEnabled, setFilterEnabled] = useState(false);
@@ -36,21 +36,23 @@ function App() {
       const rankData = await rankRes.json();
 
       setJobs(jobData);
-      setStoredJobId(rankData.jobId);
-      setIsDemo(!!rankData.isDemo);
+      setAllRankings(rankData);
 
-      // SOURCE OF TRUTH: If rankings exist for current jobId, use them. Otherwise use raw pool.
-      // We merge rankings info (total_score) into the candidate objects if they match.
-      setCandidates(candData);
-      if (rankData.candidates && rankData.candidates.length > 0) {
-        setCandidates(rankData.candidates); // Rankings endpoint returns the full sorted list
+      // Current job specific data
+      const currentRanking = rankData[selectedJobId];
+      if (currentRanking) {
+        setCandidates(currentRanking.candidates);
+        setIsDemo(!!currentRanking.isDemo);
+      } else {
+        setCandidates(candData);
+        setIsDemo(false);
       }
     } catch (err) {
       setError("Failed to connect to backend.");
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [selectedJobId]);
 
   // --- HANDLERS ---
   const handleJobSelect = (e: any) => {
@@ -113,19 +115,19 @@ function App() {
   };
 
   // --- RENDERING LOGIC ---
-  const isMatch = selectedJobId === storedJobId;
+  const currentRanking = allRankings[selectedJobId];
+  const isRanked = !!currentRanking;
   const filteredJobs = jobs.filter(j => j.title.toLowerCase().includes(searchTerm.toLowerCase()) || j.id.includes(searchTerm));
   
-  // Only show scores/summaries if the selected job matches the stored rankings
-  const displayPool = candidates.map(c => {
-    if (!isMatch) return { ...c, total_score: undefined, quirk_scores: undefined, summary: undefined };
+  let finalPool = candidates.map(c => {
+    // If not ranked for this job, hide scores
+    if (!isRanked) return { ...c, total_score: undefined, current_assessment: null };
     return c;
   });
 
-  let finalPool = filterEnabled 
-    ? displayPool.filter(c => (c.jd_match_score ?? 0) >= jdThreshold)
-    : displayPool;
-
+  if (filterEnabled) {
+    finalPool = finalPool.filter(c => (c.current_assessment?.jd_match_score ?? 0) >= jdThreshold);
+  }
   if (limitEnabled) {
     finalPool = finalPool.slice(0, topLimit);
   }
@@ -150,7 +152,7 @@ function App() {
         <div className="weight-controls">
           {Object.entries(weights).map(([k, v]) => (
             <div key={k} className="weight-item">
-              <div className="weight-header"><span>{k}</span><span>{v}x</span></div>
+              <div className="weight-header"><span style={{textTransform: 'capitalize'}}>{k}</span><span>{v}x</span></div>
               <input type="range" min="0.1" max="3" step="0.1" value={v} onChange={e => setWeights({...weights, [k]: parseFloat(e.target.value)})} />
             </div>
           ))}
@@ -162,37 +164,35 @@ function App() {
           <input type="number" value={jdThreshold} onChange={e => setJdThreshold(parseInt(e.target.value) || 0)} style={{width: '45px'}} />
           <span>%</span>
         </div>
-        
         <div className="filter-group">
           <input type="checkbox" checked={limitEnabled} onChange={e => setLimitEnabled(e.target.checked)} />
           <label>Show Top:</label>
           <input type="number" value={topLimit} onChange={e => setTopLimit(parseInt(e.target.value) || 0)} style={{width: '45px'}} />
           <span>results</span>
         </div>
-
         <div className="filter-group"><input type="checkbox" checked={reAnalyzeAll} onChange={e => setReAnalyzeAll(e.target.checked)} /><label>Force Re-analyze</label></div>
         {error && <p style={{color: 'red'}}>{error}</p>}
       </aside>
 
       <main className="main-content">
-        <h1>Rankings {isDemo && isMatch && <span className="badge">NON-AI</span>}</h1>
+        <h1>Rankings {isDemo && isRanked && <span className="badge">NON-AI</span>}</h1>
         <div className="candidate-list">
           {finalPool.map(c => (
             <div key={c.id} className="candidate-card" onClick={() => { setNewCandidate(c); setEditingId(c.id); window.scrollTo({top: 9999, behavior: 'smooth'}); }}>
               <button className="delete-btn" onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}>×</button>
               <div className="candidate-header"><h3>{c.name}</h3><span className="total-score">{c.total_score ?? '--'}</span></div>
               <div className="score-badges">
-                <div className="badge jd">JD Match: {c.jd_match_score ? `${c.jd_match_score}%` : 'Unranked'}</div>
+                <div className="badge jd">JD Match: {c.current_assessment?.jd_match_score ? `${c.current_assessment.jd_match_score}%` : 'Unranked'}</div>
               </div>
-              <p className="candidate-summary">{c.summary || "Awaiting ranking for this role."}</p>
+              <p className="candidate-summary">{c.current_assessment?.summary || "Awaiting ranking for this role."}</p>
               <div className="quirk-grid" style={{gridTemplateColumns: '1fr'}}>
-                {c.quirk_scores ? Object.entries(c.quirk_scores).map(([k, v]: any) => (
+                {c.current_assessment?.quirk_scores ? Object.entries(c.current_assessment.quirk_scores).map(([k, v]: any) => (
                   <div key={k} style={{fontSize: '0.8rem', borderBottom: '1px solid #f1f5f9', padding: '0.4rem 0'}}>
                     <span style={{fontWeight: '700', textTransform: 'capitalize'}}>{k}: </span>
                     <span>{v.reason} </span>
                     <span style={{fontWeight: '800', color: 'var(--primary)'}}>{v.score}/10</span>
                   </div>
-                )) : <span>No vibe data.</span>}
+                )) : <span>No vibe data for this role.</span>}
               </div>
             </div>
           ))}

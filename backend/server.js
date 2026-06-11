@@ -34,13 +34,12 @@ const writeJson = (file, data) => {
 // --- API Endpoints ---
 
 app.get('/api/candidates', (req, res) => {
-  const data = readJson('candidates.json') || [];
-  res.json(data);
+  res.json(readJson('candidates.json') || []);
 });
 
 app.post('/api/candidates', (req, res) => {
   const candidates = readJson('candidates.json') || [];
-  const newCand = { id: 'c' + Date.now(), ...req.body };
+  const newCand = { id: 'c' + Date.now(), ...req.body, job_assessments: {} };
   candidates.push(newCand);
   writeJson('candidates.json', candidates);
   res.status(201).json(newCand);
@@ -50,12 +49,19 @@ app.delete('/api/candidates/:id', (req, res) => {
   let candidates = readJson('candidates.json') || [];
   candidates = candidates.filter(c => c.id !== req.params.id);
   writeJson('candidates.json', candidates);
+  
+  // Also clean up rankings
+  const rankings = readJson('rankings.json') || {};
+  Object.keys(rankings).forEach(jobId => {
+    rankings[jobId] = (rankings[jobId] || []).filter(c => c.id !== req.params.id);
+  });
+  writeJson('rankings.json', rankings);
+  
   res.status(204).send();
 });
 
 app.get('/api/jobs', (req, res) => {
-  const data = readJson('jobs.json') || [];
-  res.json(data);
+  res.json(readJson('jobs.json') || []);
 });
 
 app.post('/api/jobs', (req, res) => {
@@ -67,8 +73,8 @@ app.post('/api/jobs', (req, res) => {
 });
 
 app.get('/api/rankings', (req, res) => {
-  const data = readJson('rankings.json') || { jobId: null, candidates: [], isDemo: false };
-  res.json(data);
+  // Returns object { jobId1: [...], jobId2: [...] }
+  res.json(readJson('rankings.json') || {});
 });
 
 app.post('/api/rank', async (req, res) => {
@@ -77,38 +83,23 @@ app.post('/api/rank', async (req, res) => {
   try {
     const candidates = readJson('candidates.json') || [];
     
-    // 1. Determine who needs analysis
-    // For simplicity in this rewrite, we analyze based on the reAnalyzeAll flag
-    // or if they don't have scores for THIS specific job.
+    // Determine who needs AI analysis for THIS specific job
     const needsAI = reAnalyzeAll 
       ? candidates 
-      : candidates.filter(c => !c.quirk_scores || c.last_job_id !== jobId);
+      : candidates.filter(c => !c.job_assessments || !c.job_assessments[jobId]);
 
     let apiResults = [];
     let apiUsed = false;
 
     if (needsAI.length > 0 && apiKey && apiKey !== 'your_api_key_here') {
-      const models = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash-lite", "gemini-1.5-flash-latest"];
+      const models = ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-1.5-flash-latest"];
       for (const m of models) {
         try {
-          console.log(`Trying model ${m}...`);
+          console.log(`Analyzing ${needsAI.length} candidates with ${m}...`);
           const model = genAI.getGenerativeModel({ model: m, generationConfig: { responseMimeType: "application/json" } });
           const list = needsAI.map(c => `ID:${c.id} Name:${c.name} Resume:${c.resume} Letter:${c.cover_letter}`).join("\n---\n");
-          const prompt = `Rank these candidates for: "${jobDescription}". 
-          LOGIC: If JD match < 50, summary "Basic qualifications not met", all quirk scores=1, reasons="N/A".
-          Else full analysis.
-          Return a JSON array where each object has:
-          {
-            "id": string,
-            "jd_match": number (0-100),
-            "summary": string,
-            "motivation": {"score": number (1-10), "reason": string},
-            "stability": {"score": number (1-10), "reason": string},
-            "personality": {"score": number (1-10), "reason": string},
-            "problem_approach": {"score": number (1-10), "reason": string},
-            "teamwork": {"score": number (1-10), "reason": string}
-          }
-          Candidates: ${list}`;
+          const prompt = `Rank candidates for: "${jobDescription}". 
+          JSON array of {id, motivation: {score, reason}, stability: {score, reason}, personality: {score, reason}, problem_approach: {score, reason}, teamwork: {score, reason}, jd_match, summary}.`;
           
           const result = await model.generateContent(prompt);
           apiResults = JSON.parse(result.response.text());
@@ -120,7 +111,7 @@ app.post('/api/rank', async (req, res) => {
       }
     }
 
-    // 2. Fallback to Keyword Match
+    // Fallback if AI failed
     if (!apiUsed && needsAI.length > 0) {
       console.warn("Using keyword fallback");
       const jdWords = jobDescription.toLowerCase().split(/\W+/).filter(w => w.length > 5);
@@ -130,58 +121,47 @@ app.post('/api/rank', async (req, res) => {
         const jdMatch = Math.min(60 + (matches * 5), 95);
         const mock = (s) => ({ score: s, reason: "[NON-AI] Automated match." });
         return {
-          id: c.id, 
-          motivation: mock(5), stability: mock(5), personality: mock(5), problem_approach: mock(5), teamwork: mock(5),
-          jd_match: jdMatch,
-          summary: "[NON-AI] Assessment based on keyword overlap."
+          id: c.id, jd_match: jdMatch, summary: "[NON-AI] Keyword match.",
+          motivation: mock(5), stability: mock(5), personality: mock(5), problem_approach: mock(5), teamwork: mock(5)
         };
       });
     }
 
-    // 3. Update master candidate list
+    // Update master candidate list with job-specific assessment
     const updatedCandidates = candidates.map(c => {
-      const result = apiResults.find(r => r.id === c.id);
-      if (result) {
-        return {
-          ...c,
-          quirk_scores: { 
-            motivation: result.motivation, 
-            stability: result.stability, 
-            personality: result.personality, 
-            problem_approach: result.problem_approach, 
-            teamwork: result.teamwork 
-          },
-          jd_match_score: result.jd_match,
-          summary: result.summary,
-          last_job_id: jobId
+      const res = apiResults.find(r => r.id === c.id);
+      if (res) {
+        const assessments = c.job_assessments || {};
+        assessments[jobId] = {
+          quirk_scores: { motivation: res.motivation, stability: res.stability, personality: res.personality, problem_approach: res.problem_approach, teamwork: res.teamwork },
+          jd_match_score: res.jd_match,
+          summary: res.summary
         };
+        return { ...c, job_assessments: assessments };
       }
       return c;
     });
     writeJson('candidates.json', updatedCandidates);
 
-    // 4. Calculate Final Rankings
+    // Calculate rankings for THIS job
     const totalWeight = Object.values(weights).reduce((a, b) => a + (b || 1), 0);
     const ranked = updatedCandidates.map(c => {
-      if (c.last_job_id !== jobId || !c.quirk_scores) return { ...c, total_score: 0 };
+      const assessment = c.job_assessments ? c.job_assessments[jobId] : null;
+      if (!assessment) return { ...c, total_score: 0, current_assessment: null };
       
-      const q = c.quirk_scores;
-      // Extract numeric scores for math
-      const s = {
-        mot: q.motivation?.score || 1,
-        sta: q.stability?.score || 1,
-        per: q.personality?.score || 1,
-        pro: q.problem_approach?.score || 1,
-        tea: q.teamwork?.score || 1
-      };
-
+      const q = assessment.quirk_scores;
+      const s = { mot: q.motivation?.score || 1, sta: q.stability?.score || 1, per: q.personality?.score || 1, pro: q.problem_approach?.score || 1, tea: q.teamwork?.score || 1 };
       const weightedVibe = ((s.mot * weights.motivation) + (s.sta * weights.stability) + (s.per * weights.personality) + (s.pro * weights.problem_approach) + (s.tea * weights.teamwork)) / totalWeight;
-      const total = Math.round(((c.jd_match_score * 0.5) + (weightedVibe * 5)) * 10) / 10;
-      return { ...c, total_score: total };
+      const total = Math.round(((assessment.jd_match_score * 0.5) + (weightedVibe * 5)) * 10) / 10;
+      
+      return { ...c, total_score: total, current_assessment: assessment };
     }).sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
 
-    const finalResult = { jobId, candidates: ranked, isDemo: !apiUsed };
-    writeJson('rankings.json', finalResult);
+    // Update rankings.json (keyed by jobId)
+    const allRankings = readJson('rankings.json') || {};
+    allRankings[jobId] = { candidates: ranked, isDemo: !apiUsed };
+    writeJson('rankings.json', allRankings);
+    
     res.json(ranked);
 
   } catch (error) {

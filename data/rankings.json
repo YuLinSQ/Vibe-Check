@@ -1,51 +1,542 @@
 {
-  "jobId": "001",
-  "candidates": [
-    {
-      "id": "c1",
-      "name": "Alex Rivera",
-      "total_score": 81.5,
-      "jd_match_score": 85,
-      "quirk_scores": {
-        "motivation": { "score": 8, "reason": "Alex is driven by building impactful tools and performance optimization." },
-        "stability": { "score": 8, "reason": "8 years of consistent experience at reputable tech companies." },
-        "personality": { "score": 7, "reason": "System-minded and ownership-oriented approach." },
-        "problem_approach": { "score": 9, "reason": "High learning velocity and focus on scalability." },
-        "teamwork": { "score": 6, "reason": "Collaborative experience implied by tenure in large teams." }
+  "001": {
+    "jobId": "001",
+    "isDemo": false,
+    "candidates": [
+      {
+        "id": "c1",
+        "name": "Alex Rivera",
+        "resume": "Senior Software Engineer with 8 years of experience in React, Node.js, and AWS. Previously at TechCorp and InnovateSoft. Strong focus on performance optimization and system architecture.",
+        "cover_letter": "I am excited to apply for the Senior Engineer position. I love solving complex problems and believe in building tools that make a real difference. My experience at TechCorp taught me the importance of scalability.",
+        "linkedin": "Tech enthusiast. Building the future of web apps. 500+ connections.",
+        "github": "Frequent contributor to open-source UI libraries. Projects include a custom state management tool and a performance profiler.",
+        "quirk_scores": {
+          "motivation": {
+            "score": 8,
+            "reason": "Alex is driven by building impactful tools and performance optimization."
+          },
+          "stability": {
+            "score": 8,
+            "reason": "8 years of consistent experience at reputable tech companies."
+          },
+          "personality": {
+            "score": 7,
+            "reason": "System-minded and ownership-oriented approach."
+          },
+          "problem_approach": {
+            "score": 9,
+            "reason": "High learning velocity and focus on scalability."
+          },
+          "teamwork": {
+            "score": 6,
+            "reason": "Collaborative experience implied by tenure in large teams."
+          }
+        },
+        "jd_match_score": 85,
+        "summary": "Strong senior engineer with a direct technical match and a proven builder instinct.",
+        "last_job_id": "003",
+        "job_assessments": {
+          "001": {
+            "quirk_scores": {
+              "motivation": {
+                "score": 8,
+                "reason": "Alex is driven by building impactful tools and performance optimization."
+              },
+              "stability": {
+                "score": 8,
+                "reason": "8 years of consistent experience at reputable tech companies."
+              },
+              "personality": {
+                "score": 7,
+                "reason": "System-minded and ownership-oriented approach."
+              },
+              "problem_approach": {
+                "score": 9,
+                "reason": "High learning velocity and focus on scalability."
+              },
+              "teamwork": {
+                "score": 6,
+                "reason": "Collaborative experience implied by tenure in large teams."
+              }
+            },
+            "jd_match_score": 85,
+            "summary": "Strong senior engineer with a direct technical match and a proven builder instinct."
+          }
+        },
+        "total_score": 80.5,
+        "current_assessment": {
+          "quirk_scores": {
+            "motivation": {
+              "score": 8,
+              "reason": "Alex is driven by building impactful tools and performance optimization."
+            },
+            "stability": {
+              "score": 8,
+              "reason": "8 years of consistent experience at reputable tech companies."
+            },
+            "personality": {
+              "score": 7,
+              "reason": "System-minded and ownership-oriented approach."
+            },
+            "problem_approach": {
+              "score": 9,
+              "reason": "High learning velocity and focus on scalability."
+            },
+            "teamwork": {
+              "score": 6,
+              "reason": "Collaborative experience implied by tenure in large teams."
+            }
+          },
+          "jd_match_score": 85,
+          "summary": "Strong senior engineer with a direct technical match and a proven builder instinct."
+        }
       },
-      "summary": "Strong senior engineer with a direct technical match and a proven builder instinct.",
-      "last_job_id": "001"
-    },
-    {
-      "id": "c2",
-      "name": "Sam Taylor",
-      "total_score": 71.5,
-      "jd_match_score": 65,
-      "quirk_scores": {
-        "motivation": { "score": 9, "reason": "Sam shows extremely high eagerness to learn and grow." },
-        "stability": { "score": 6, "reason": "3 years experience, showing good initial trajectory." },
-        "personality": { "score": 8, "reason": "Fast learner with a bias toward shipping personal tools." },
-        "problem_approach": { "score": 7, "reason": "Practical builder approach through personal scripts." },
-        "teamwork": { "score": 9, "reason": "Strongly desires a collaborative team environment." }
+      {
+        "id": "c2",
+        "name": "Sam Taylor",
+        "resume": "Mid-level Full Stack Developer. Skilled in Python, Django, and React. 3 years of experience. Boot camp graduate with a passion for clean code.",
+        "cover_letter": "I'm a fast learner looking to grow my career. I've been working on a few personal projects and am eager to join a collaborative team where I can contribute and learn.",
+        "linkedin": "Passionate developer looking for new opportunities.",
+        "github": "Personal portfolio and several small utility scripts.",
+        "quirk_scores": {
+          "motivation": {
+            "score": 9,
+            "reason": "Sam shows extremely high eagerness to learn and grow."
+          },
+          "stability": {
+            "score": 6,
+            "reason": "3 years experience, showing good initial trajectory."
+          },
+          "personality": {
+            "score": 8,
+            "reason": "Fast learner with a bias toward shipping personal tools."
+          },
+          "problem_approach": {
+            "score": 7,
+            "reason": "Practical builder approach through personal scripts."
+          },
+          "teamwork": {
+            "score": 9,
+            "reason": "Strongly desires a collaborative team environment."
+          }
+        },
+        "jd_match_score": 65,
+        "summary": "Solid mid-level candidate who meets all baseline requirements and shows high growth potential.",
+        "last_job_id": "003",
+        "job_assessments": {
+          "001": {
+            "quirk_scores": {
+              "motivation": {
+                "score": 9,
+                "reason": "Sam shows extremely high eagerness to learn and grow."
+              },
+              "stability": {
+                "score": 6,
+                "reason": "3 years experience, showing good initial trajectory."
+              },
+              "personality": {
+                "score": 8,
+                "reason": "Fast learner with a bias toward shipping personal tools."
+              },
+              "problem_approach": {
+                "score": 7,
+                "reason": "Practical builder approach through personal scripts."
+              },
+              "teamwork": {
+                "score": 9,
+                "reason": "Strongly desires a collaborative team environment."
+              }
+            },
+            "jd_match_score": 65,
+            "summary": "Solid mid-level candidate who meets all baseline requirements and shows high growth potential."
+          }
+        },
+        "total_score": 71.5,
+        "current_assessment": {
+          "quirk_scores": {
+            "motivation": {
+              "score": 9,
+              "reason": "Sam shows extremely high eagerness to learn and grow."
+            },
+            "stability": {
+              "score": 6,
+              "reason": "3 years experience, showing good initial trajectory."
+            },
+            "personality": {
+              "score": 8,
+              "reason": "Fast learner with a bias toward shipping personal tools."
+            },
+            "problem_approach": {
+              "score": 7,
+              "reason": "Practical builder approach through personal scripts."
+            },
+            "teamwork": {
+              "score": 9,
+              "reason": "Strongly desires a collaborative team environment."
+            }
+          },
+          "jd_match_score": 65,
+          "summary": "Solid mid-level candidate who meets all baseline requirements and shows high growth potential."
+        }
       },
-      "summary": "Solid mid-level candidate who meets all baseline requirements and shows high growth potential.",
-      "last_job_id": "001"
-    },
-    {
-      "id": "c3",
-      "name": "Jordan Lee",
-      "total_score": 20,
-      "jd_match_score": 30,
-      "quirk_scores": {
-        "motivation": { "score": 1, "reason": "N/A" },
-        "stability": { "score": 1, "reason": "N/A" },
-        "personality": { "score": 1, "reason": "N/A" },
-        "problem_approach": { "score": 1, "reason": "N/A" },
-        "teamwork": { "score": 1, "reason": "N/A" }
+      {
+        "id": "c3",
+        "name": "Jordan Lee",
+        "resume": "Lead Developer with 10+ years of experience. Expert in Java, Spring Boot, and Microservices. Lead teams of 10+ engineers.",
+        "cover_letter": "I am looking for a leadership role where I can mentor junior devs and drive technical strategy. I have a track record of delivering high-quality software on time.",
+        "linkedin": "Strategic thinker. Team leader. Tech visionary.",
+        "github": "Occasional contributions to enterprise-level frameworks.",
+        "quirk_scores": {
+          "motivation": {
+            "score": 1,
+            "reason": "N/A"
+          },
+          "stability": {
+            "score": 1,
+            "reason": "N/A"
+          },
+          "personality": {
+            "score": 1,
+            "reason": "N/A"
+          },
+          "problem_approach": {
+            "score": 1,
+            "reason": "N/A"
+          },
+          "teamwork": {
+            "score": 1,
+            "reason": "N/A"
+          }
+        },
+        "jd_match_score": 30,
+        "summary": "Basic qualifications not met",
+        "last_job_id": "003",
+        "job_assessments": {
+          "001": {
+            "quirk_scores": {
+              "motivation": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "stability": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "personality": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "problem_approach": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "teamwork": {
+                "score": 1,
+                "reason": "N/A"
+              }
+            },
+            "jd_match_score": 30,
+            "summary": "Basic qualifications not met"
+          }
+        },
+        "total_score": 20,
+        "current_assessment": {
+          "quirk_scores": {
+            "motivation": {
+              "score": 1,
+              "reason": "N/A"
+            },
+            "stability": {
+              "score": 1,
+              "reason": "N/A"
+            },
+            "personality": {
+              "score": 1,
+              "reason": "N/A"
+            },
+            "problem_approach": {
+              "score": 1,
+              "reason": "N/A"
+            },
+            "teamwork": {
+              "score": 1,
+              "reason": "N/A"
+            }
+          },
+          "jd_match_score": 30,
+          "summary": "Basic qualifications not met"
+        }
+      }
+    ]
+  },
+  "003": {
+    "jobId": "003",
+    "isDemo": false,
+    "candidates": [
+      {
+        "id": "c1",
+        "name": "Alex Rivera",
+        "resume": "Senior Software Engineer with 8 years of experience in React, Node.js, and AWS. Previously at TechCorp and InnovateSoft. Strong focus on performance optimization and system architecture.",
+        "cover_letter": "I am excited to apply for the Senior Engineer position. I love solving complex problems and believe in building tools that make a real difference. My experience at TechCorp taught me the importance of scalability.",
+        "linkedin": "Tech enthusiast. Building the future of web apps. 500+ connections.",
+        "github": "Frequent contributor to open-source UI libraries. Projects include a custom state management tool and a performance profiler.",
+        "quirk_scores": {
+          "motivation": {
+            "score": 9,
+            "reason": "Expresses excitement for the role, mentions solving complex problems and building impactful tools, and highlights relevant experience with scalability."
+          },
+          "stability": {
+            "score": 8,
+            "reason": "8 years of experience suggests good career stability. Previous roles at TechCorp and InnovateSoft indicate a pattern of professional engagement."
+          },
+          "personality": {
+            "score": 8,
+            "reason": "Focus on performance optimization and system architecture, coupled with a desire to build tools that make a difference, suggests a driven and impactful personality."
+          },
+          "problem_approach": {
+            "score": 9,
+            "reason": "Directly states a love for solving complex problems and emphasizes experience in performance optimization and system architecture, aligning well with automating friction points."
+          },
+          "teamwork": {
+            "score": 7,
+            "reason": "While not explicitly stating teamwork, the focus on building tools for other teams implies collaboration. Experience at previous companies suggests ability to work within a team structure."
+          }
+        },
+        "jd_match_score": 90,
+        "summary": "Strong match. Extensive experience directly aligns with required technologies and responsibilities. Demonstrates a problem-solving and product-oriented mindset.",
+        "last_job_id": "003",
+        "job_assessments": {
+          "001": {
+            "quirk_scores": {
+              "motivation": {
+                "score": 8,
+                "reason": "Alex is driven by building impactful tools and performance optimization."
+              },
+              "stability": {
+                "score": 8,
+                "reason": "8 years of consistent experience at reputable tech companies."
+              },
+              "personality": {
+                "score": 7,
+                "reason": "System-minded and ownership-oriented approach."
+              },
+              "problem_approach": {
+                "score": 9,
+                "reason": "High learning velocity and focus on scalability."
+              },
+              "teamwork": {
+                "score": 6,
+                "reason": "Collaborative experience implied by tenure in large teams."
+              }
+            },
+            "jd_match_score": 85,
+            "summary": "Strong senior engineer with a direct technical match and a proven builder instinct."
+          }
+        },
+        "total_score": 86,
+        "current_assessment": {
+          "quirk_scores": {
+            "motivation": {
+              "score": 9,
+              "reason": "Expresses excitement for the role, mentions solving complex problems and building impactful tools, and highlights relevant experience with scalability."
+            },
+            "stability": {
+              "score": 8,
+              "reason": "8 years of experience suggests good career stability. Previous roles at TechCorp and InnovateSoft indicate a pattern of professional engagement."
+            },
+            "personality": {
+              "score": 8,
+              "reason": "Focus on performance optimization and system architecture, coupled with a desire to build tools that make a difference, suggests a driven and impactful personality."
+            },
+            "problem_approach": {
+              "score": 9,
+              "reason": "Directly states a love for solving complex problems and emphasizes experience in performance optimization and system architecture, aligning well with automating friction points."
+            },
+            "teamwork": {
+              "score": 7,
+              "reason": "While not explicitly stating teamwork, the focus on building tools for other teams implies collaboration. Experience at previous companies suggests ability to work within a team structure."
+            }
+          },
+          "jd_match_score": 90,
+          "summary": "Strong match. Extensive experience directly aligns with required technologies and responsibilities. Demonstrates a problem-solving and product-oriented mindset."
+        }
       },
-      "summary": "Basic qualifications not met",
-      "last_job_id": "001"
-    }
-  ],
-  "isDemo": false
+      {
+        "id": "c3",
+        "name": "Jordan Lee",
+        "resume": "Lead Developer with 10+ years of experience. Expert in Java, Spring Boot, and Microservices. Lead teams of 10+ engineers.",
+        "cover_letter": "I am looking for a leadership role where I can mentor junior devs and drive technical strategy. I have a track record of delivering high-quality software on time.",
+        "linkedin": "Strategic thinker. Team leader. Tech visionary.",
+        "github": "Occasional contributions to enterprise-level frameworks.",
+        "quirk_scores": {
+          "motivation": {
+            "score": 8,
+            "reason": "Clear motivation for a leadership role, mentoring, and driving technical strategy. Expresses a desire to deliver high-quality software."
+          },
+          "stability": {
+            "score": 10,
+            "reason": "10+ years of experience and leading teams of 10+ engineers indicate exceptional career stability and progression."
+          },
+          "personality": {
+            "score": 9,
+            "reason": "Focus on leadership, mentoring, and driving technical strategy suggests a proactive, responsible, and influential personality."
+          },
+          "problem_approach": {
+            "score": 8,
+            "reason": "Track record of delivering high-quality software implies a systematic and effective approach to problem-solving, though not directly tied to the specified technologies."
+          },
+          "teamwork": {
+            "score": 9,
+            "reason": "Explicitly seeks a role to mentor junior developers and has a track record of leading teams, indicating strong collaborative and leadership skills."
+          }
+        },
+        "jd_match_score": 60,
+        "summary": "Partial match. Extensive leadership and architecting experience, but primary tech stack (Java/Spring Boot) differs from the job description's focus on JavaScript ecosystem. Demonstrates strong leadership and mentoring qualities.",
+        "last_job_id": "003",
+        "job_assessments": {
+          "001": {
+            "quirk_scores": {
+              "motivation": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "stability": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "personality": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "problem_approach": {
+                "score": 1,
+                "reason": "N/A"
+              },
+              "teamwork": {
+                "score": 1,
+                "reason": "N/A"
+              }
+            },
+            "jd_match_score": 30,
+            "summary": "Basic qualifications not met"
+          }
+        },
+        "total_score": 74,
+        "current_assessment": {
+          "quirk_scores": {
+            "motivation": {
+              "score": 8,
+              "reason": "Clear motivation for a leadership role, mentoring, and driving technical strategy. Expresses a desire to deliver high-quality software."
+            },
+            "stability": {
+              "score": 10,
+              "reason": "10+ years of experience and leading teams of 10+ engineers indicate exceptional career stability and progression."
+            },
+            "personality": {
+              "score": 9,
+              "reason": "Focus on leadership, mentoring, and driving technical strategy suggests a proactive, responsible, and influential personality."
+            },
+            "problem_approach": {
+              "score": 8,
+              "reason": "Track record of delivering high-quality software implies a systematic and effective approach to problem-solving, though not directly tied to the specified technologies."
+            },
+            "teamwork": {
+              "score": 9,
+              "reason": "Explicitly seeks a role to mentor junior developers and has a track record of leading teams, indicating strong collaborative and leadership skills."
+            }
+          },
+          "jd_match_score": 60,
+          "summary": "Partial match. Extensive leadership and architecting experience, but primary tech stack (Java/Spring Boot) differs from the job description's focus on JavaScript ecosystem. Demonstrates strong leadership and mentoring qualities."
+        }
+      },
+      {
+        "id": "c2",
+        "name": "Sam Taylor",
+        "resume": "Mid-level Full Stack Developer. Skilled in Python, Django, and React. 3 years of experience. Boot camp graduate with a passion for clean code.",
+        "cover_letter": "I'm a fast learner looking to grow my career. I've been working on a few personal projects and am eager to join a collaborative team where I can contribute and learn.",
+        "linkedin": "Passionate developer looking for new opportunities.",
+        "github": "Personal portfolio and several small utility scripts.",
+        "quirk_scores": {
+          "motivation": {
+            "score": 7,
+            "reason": "Expresses eagerness to learn and grow, and a passion for clean code, indicating a positive attitude."
+          },
+          "stability": {
+            "score": 5,
+            "reason": "3 years of experience is below the requirement. Boot camp graduate status suggests a less traditional or shorter career path so far."
+          },
+          "personality": {
+            "score": 6,
+            "reason": "Passion for clean code and eagerness to learn are positive traits, but the lack of depth in experience makes it harder to assess broader personality fit for a senior role."
+          },
+          "problem_approach": {
+            "score": 5,
+            "reason": "Mentions personal projects, which is good, but lacks evidence of tackling complex production-level problems or optimizing systems at scale."
+          },
+          "teamwork": {
+            "score": 7,
+            "reason": "Explicitly states eagerness to join a collaborative team, which is a positive sign for teamwork."
+          }
+        },
+        "jd_match_score": 40,
+        "summary": "Basic qualifications not met. Lacks the required years of experience and the technology stack (Python/Django) is not a primary match. Motivation for learning is present, but depth of experience is insufficient.",
+        "last_job_id": "003",
+        "job_assessments": {
+          "001": {
+            "quirk_scores": {
+              "motivation": {
+                "score": 9,
+                "reason": "Sam shows extremely high eagerness to learn and grow."
+              },
+              "stability": {
+                "score": 6,
+                "reason": "3 years experience, showing good initial trajectory."
+              },
+              "personality": {
+                "score": 8,
+                "reason": "Fast learner with a bias toward shipping personal tools."
+              },
+              "problem_approach": {
+                "score": 7,
+                "reason": "Practical builder approach through personal scripts."
+              },
+              "teamwork": {
+                "score": 9,
+                "reason": "Strongly desires a collaborative team environment."
+              }
+            },
+            "jd_match_score": 65,
+            "summary": "Solid mid-level candidate who meets all baseline requirements and shows high growth potential."
+          }
+        },
+        "total_score": 50,
+        "current_assessment": {
+          "quirk_scores": {
+            "motivation": {
+              "score": 7,
+              "reason": "Expresses eagerness to learn and grow, and a passion for clean code, indicating a positive attitude."
+            },
+            "stability": {
+              "score": 5,
+              "reason": "3 years of experience is below the requirement. Boot camp graduate status suggests a less traditional or shorter career path so far."
+            },
+            "personality": {
+              "score": 6,
+              "reason": "Passion for clean code and eagerness to learn are positive traits, but the lack of depth in experience makes it harder to assess broader personality fit for a senior role."
+            },
+            "problem_approach": {
+              "score": 5,
+              "reason": "Mentions personal projects, which is good, but lacks evidence of tackling complex production-level problems or optimizing systems at scale."
+            },
+            "teamwork": {
+              "score": 7,
+              "reason": "Explicitly states eagerness to join a collaborative team, which is a positive sign for teamwork."
+            }
+          },
+          "jd_match_score": 40,
+          "summary": "Basic qualifications not met. Lacks the required years of experience and the technology stack (Python/Django) is not a primary match. Motivation for learning is present, but depth of experience is insufficient."
+        }
+      }
+    ]
+  }
 }
