@@ -118,6 +118,29 @@ select {
   background-color: #f5f3ff;
 }
 
+.slack-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4A154B; /* Slack Purple */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.slack-button:hover {
+  background-color: #611f69;
+  transform: translateY(-1px);
+}
+
 .weight-controls {
   display: flex;
   flex-direction: column;

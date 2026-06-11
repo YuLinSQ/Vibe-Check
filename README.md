@@ -80,5 +80,9 @@ As the platform scales from a single-day prototype to a production-ready tool, s
 - **Anonymization:** Implement an automated scrubbing pipeline to strip PII (Names, Addresses) before LLM transmission.
 - **Audit Logging:** Maintain deterministic logs of AI rationales to ensure transparency and defend against algorithmic bias.
 
+### 5. AI-Powered Interview Guides
+- **Behavioral Questions:** Auto-generate candidate-specific interview questions based on identified "vibe" gaps (e.g., if Teamwork scores low, generate targeted probes for collaboration style).
+- **Signal-to-Question Mapping:** Map exact technical deficiencies (from JD Match) to specific whiteboarding or technical assessment prompts.
+
 ---
 *Built as a high-impact, one-day recruitment prototype.*
