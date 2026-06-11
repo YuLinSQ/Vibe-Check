@@ -1,4 +1,4 @@
-# Vibe Check - AI Talent Ranking System
+# Vibe Check - AI Talent Ranking System 🎈🥳✅
 
 ## 💡 Inspiration
 I built this platform to streamline the highly congested technical recruiting process. The goal is to cut through the noise by rapidly surfacing high-signal candidates based on objective metrics and behavioral indicators, rather than relying on manual resume screening. To create a cleaner, more centralized hiring experience, the platform also includes a complete CRUD interface for managing both job descriptions and applicant pipelines.
@@ -13,30 +13,35 @@ Early iterations considered live-scraping candidate data from platforms like Lin
 ## 🚀 The Vision
 Most hiring tools look for skills. **Vibe Check** looks for the person. By analyzing resumes, cover letters, and social profiles, it provides a holistic score that balances technical requirements with behavioral traits like motivation, teamwork, and problem-solving styles.
 
-## ✨ Features
+## ✨ Key Features
 
-### 1. Dual-Track Scoring
+### 1. Dual-Track Scoring & AI Reasoning
 - **JD Match Score (50%):** A traditional evaluation of how well a candidate's skills and experience align with the Job Description.
 - **Vibe Score (50%):** A weighted average of five behavioral "quirks" extracted via AI analysis.
+- **Qualitative Reasoning:** For every score awarded, the AI provides a specific reason (e.g., *"Alex scored 9/10 in Problem Approach due to his focus on scalability and system architecture"*).
 
-### 2. The 5 Behavioral Quirks
-Recruiters can customize the importance of each trait using real-time sliders:
-- **Motivation:** What drives this candidate?
-- **Stability:** Are they likely to stay long-term?
-- **Personality:** Cultural fit and overall "vibe."
-- **Problem Approach:** Are they analytical, creative, or a "brute-force" fixer?
-- **Teamwork Potential:** Collaboration style and leadership traits.
+### 2. Multi-Job Management & Search
+- **Job Library:** Save, edit, and manage multiple Job Descriptions in a centralized database.
+- **Isolated Rankings:** Switching between jobs instantly restores the unique rankings and scores for that specific role.
+- **Smart Search:** Quickly find roles by **Job Title** or **Unique Job ID** (e.g., `001`).
 
-### 3. Smart Fallback System
-To ensure a seamless user experience regardless of API limits:
-- **AI Mode:** Uses `gemini-2.0-flash` (with fallbacks to 2.5 and 1.5) for deep semantic analysis.
-- **Batch Processing:** Sends all candidates in a single request to minimize API quota usage.
-- **Demo Mode:** If API limits are reached, the system automatically switches to a keyword-overlap algorithm to simulate rankings.
+### 3. Vibe Shape Visualization (Radar Charts)
+- **Instant Signal:** Each candidate card features a pentagonal Radar Chart (Spider Chart) that visually represents their behavioral profile.
+- **Pattern Recognition:** Instantly distinguish between "Technical Specialists" and "Team-Oriented Leaders" at a glance.
+
+### 4. Advanced Pipeline Filtering
+- **Technical Thresholds:** Hide any candidates who fall below a specific **JD Match %** (e.g., Hide all < 70% matches).
+- **The Shortlist:** Use the "Show Top X" filter to limit your view to only the highest-ranked candidates (e.g., Top 5).
+
+### 5. High-Efficiency Engine
+- **Score Persistence:** Analyzed results are saved permanently. The system **skips AI analysis** for already-assessed candidates to save time and API tokens.
+- **Smart Fallback:** If API limits are reached, the system automatically switches to a **Non-AI Keyword Match** algorithm to maintain functionality.
 
 ## 🛠️ Tech Stack
-- **Frontend:** React, TypeScript, Vite, Vanilla CSS
+- **Frontend:** React, TypeScript, Vite, Vanilla CSS (Custom SVG Graphics)
 - **Backend:** Node.js, Express, Google Generative AI SDK
-- **Data:** JSON-based local storage (`data/candidates.json`)
+- **Models:** Gemini 2.5 (Flash/Pro), 2.0 (Flash/Lite), 1.5 (Flash/Pro)
+- **Data:** JSON-based persistent storage (`data/candidates.json`, `data/jobs.json`, `data/rankings.json`)
 
 ## ⚙️ Setup & Installation
 
@@ -47,48 +52,33 @@ GEMINI_API_KEY=your_actual_api_key_here
 PORT=5000
 ```
 
-### 2. Install Dependencies
-From the root directory:
+### 2. Install & Run
 ```bash
 npm install
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-### 3. Run the Application
-Start both the frontend and backend with one command:
-```bash
 npm run dev
 ```
 - **Web Interface:** `http://localhost:5173`
 - **API Server:** `http://localhost:5000`
 
-## 📊 Data Structure
-- **Input:** `data/candidates.json` - Add candidate resumes and cover letters here.
-- **Output:** `data/rankings.json` - The system exports the most recent ranking results here automatically.
-
 ---
 
 ## 📈 Future Considerations and Scalability
-As the platform scales from a single-day prototype to a production-ready tool, several architectural upgrades are planned to address scalability, data integrity, and operational efficiency.
+As the platform scales from a single-day prototype to a production-ready tool, several architectural upgrades are planned:
 
 ### 1. Cloud Database Migration & Storage Strategy
-The current architecture utilizes a localized data storage system, which presents a single point of failure and limits concurrent multi-user operations.
-- **Target Architecture:** Migrate the local state to a managed cloud database. A relational model like PostgreSQL (via AWS RDS or Supabase) will be used to enforce relational integrity between job descriptions, candidates, and multi-tenant recruiter accounts.
-- **Object Storage:** Shift raw text blocks (large resumes and cover letters) into an object store like Amazon S3, storing only the metadata and file paths within the database to optimize query performance.
+- **Target Architecture:** Migrate to PostgreSQL (Supabase/RDS) for multi-tenant recruiter accounts.
+- **Object Storage:** Shift raw resumes into Amazon S3, storing only metadata in the DB.
 
 ### 2. LLM Cost Optimization & Caching Layers
-Relying entirely on live API requests for every candidate evaluation scales costs linearly and introduces latency.
-- **Semantic Caching:** Implement a caching layer using Redis or GPTCache. If an identical or highly similar resume is analyzed against the same job description, the platform will serve the cached scorecard instead of invoking a new LLM generation.
-- **Model Tiering:** Introduce a hybrid inference strategy. Use smaller, cost-effective models (or locally hosted open-source models like Llama 3) for deterministic tasks like data extraction and formatting, reserving premium models exclusively for high-reasoning behavioral analysis.
+- **Semantic Caching:** Implement Redis/GPTCache to serve scorecards for similar resumes without new LLM generation.
+- **Model Tiering:** Use local open-source models (Llama 3) for extraction, reserving premium LLMs for deep behavioral analysis.
 
 ### 3. Vector Embeddings & Semantic Search
-The current system scores candidates sequentially using structured prompt heuristics.
-- **Vector Pipeline:** Convert resumes and job descriptions into high-dimensional vector embeddings. By storing these in a vector database (such as pgvector or Pinecone), the system can perform instant semantic search and mathematical cosine similarity matches across thousands of profiles before running intensive behavioral evaluations.
+- **Vector Pipeline:** Use `pgvector` or Pinecone for instant mathematical similarity matching across thousands of profiles before running intensive AI evaluations.
 
 ### 4. Data Privacy, Compliance, and PII Masking
-Automated talent evaluation requires strict adherence to data privacy standards.
-- **Anonymization Layer:** Implement an automated data-scrubbing pipeline before payloads are transmitted to third-party LLM providers. This pipeline will strip out Personally Identifiable Information (PII) such as full names, phone numbers, and physical addresses, evaluating candidates entirely on their merits and behavioral signals.
-- **Audit Logging:** Build deterministic compliance logs that map exact AI rationales to hiring scores, ensuring transparency and defending against algorithmic bias.
+- **Anonymization:** Implement an automated scrubbing pipeline to strip PII (Names, Addresses) before LLM transmission.
+- **Audit Logging:** Maintain deterministic logs of AI rationales to ensure transparency and defend against algorithmic bias.
 
+---
 *Built as a high-impact, one-day recruitment prototype.*
