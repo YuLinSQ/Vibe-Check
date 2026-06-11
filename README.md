@@ -68,4 +68,27 @@ npm run dev
 - **Output:** `data/rankings.json` - The system exports the most recent ranking results here automatically.
 
 ---
+
+## 📈 Future Considerations and Scalability
+As the platform scales from a single-day prototype to a production-ready tool, several architectural upgrades are planned to address scalability, data integrity, and operational efficiency.
+
+### 1. Cloud Database Migration & Storage Strategy
+The current architecture utilizes a localized data storage system, which presents a single point of failure and limits concurrent multi-user operations.
+- **Target Architecture:** Migrate the local state to a managed cloud database. A relational model like PostgreSQL (via AWS RDS or Supabase) will be used to enforce relational integrity between job descriptions, candidates, and multi-tenant recruiter accounts.
+- **Object Storage:** Shift raw text blocks (large resumes and cover letters) into an object store like Amazon S3, storing only the metadata and file paths within the database to optimize query performance.
+
+### 2. LLM Cost Optimization & Caching Layers
+Relying entirely on live API requests for every candidate evaluation scales costs linearly and introduces latency.
+- **Semantic Caching:** Implement a caching layer using Redis or GPTCache. If an identical or highly similar resume is analyzed against the same job description, the platform will serve the cached scorecard instead of invoking a new LLM generation.
+- **Model Tiering:** Introduce a hybrid inference strategy. Use smaller, cost-effective models (or locally hosted open-source models like Llama 3) for deterministic tasks like data extraction and formatting, reserving premium models exclusively for high-reasoning behavioral analysis.
+
+### 3. Vector Embeddings & Semantic Search
+The current system scores candidates sequentially using structured prompt heuristics.
+- **Vector Pipeline:** Convert resumes and job descriptions into high-dimensional vector embeddings. By storing these in a vector database (such as pgvector or Pinecone), the system can perform instant semantic search and mathematical cosine similarity matches across thousands of profiles before running intensive behavioral evaluations.
+
+### 4. Data Privacy, Compliance, and PII Masking
+Automated talent evaluation requires strict adherence to data privacy standards.
+- **Anonymization Layer:** Implement an automated data-scrubbing pipeline before payloads are transmitted to third-party LLM providers. This pipeline will strip out Personally Identifiable Information (PII) such as full names, phone numbers, and physical addresses, evaluating candidates entirely on their merits and behavioral signals.
+- **Audit Logging:** Build deterministic compliance logs that map exact AI rationales to hiring scores, ensuring transparency and defending against algorithmic bias.
+
 *Built as a high-impact, one-day recruitment prototype.*

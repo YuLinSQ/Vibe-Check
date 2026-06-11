@@ -8,5 +8,10 @@
     "id": "002",
     "title": "test job",
     "description": "this is a dummy job for testing"
+  },
+  {
+    "id": "003",
+    "title": "Full Stack Software Engineer (Internal Tools)",
+    "description": "What You'll Do\nLead the development of internal tools that empower our recruiting and ops teams to work 10x faster.\nDesign, build, and maintain robust APIs and responsive frontends using React, TypeScript, and Node.js.\nArchitect scalable data models and optimize database queries for high-performance talent analytics.\nCollaborate with stakeholders to identify friction points in the hiring process and automate them away.\nMentor junior engineers and champion high standards for code quality and system reliability.\n\nWhat You'll Bring\n5+ years of professional experience building production-grade web applications.\nStrong proficiency in the modern JavaScript ecosystem (React, Node, TypeScript).\nDeep understanding of relational databases (PostgreSQL/SQL) and API design principles.\nProven 'builder's instinct'—you've built side projects or open-source tools to solve your own problems.\nA product mindset: you care about the 'why' behind the features you build.\nComfort working in a fast-paced environment with high levels of ownership and autonomy."
   }
 ]
