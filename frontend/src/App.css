@@ -337,12 +337,55 @@ input[type="range"] {
 
 /* Quirk Grid */
 .quirk-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
+  display: flex;
+  gap: 1.5rem;
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid var(--border-color);
+  align-items: flex-start;
+}
+
+.radar-container {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.radar-grid {
+  fill: none;
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.radar-axis {
+  stroke: #cbd5e1;
+  stroke-width: 1;
+}
+
+.radar-area {
+  fill: var(--primary);
+  fill-opacity: 0.2;
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.quirk-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quirk-item {
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.candidate-card {
+  /* ... existing ... */
+  min-width: 500px;
 }
 
 .quirk-stat {

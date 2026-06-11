@@ -16,6 +16,41 @@ const Logo = () => (
   </svg>
 );
 
+const RadarChart = ({ scores }: { scores: any }) => {
+  const points = [
+    { label: 'motivation', angle: 0 },
+    { label: 'personality', angle: 72 },
+    { label: 'teamwork', angle: 144 },
+    { label: 'problem_approach', angle: 216 },
+    { label: 'stability', angle: 288 },
+  ];
+
+  const getPoint = (angle: number, value: number) => {
+    const r = (value / 10) * 40; // max radius 40
+    const rad = (angle - 90) * (Math.PI / 180);
+    return `${50 + r * Math.cos(rad)},${50 + r * Math.sin(rad)}`;
+  };
+
+  const areaPath = points.map(p => getPoint(p.angle, scores[p.label]?.score || 0)).join(' ');
+
+  return (
+    <div className="radar-container">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        {/* Grid Circles */}
+        {[2.5, 5, 7.5, 10].map(v => (
+          <polygon key={v} className="radar-grid" points={points.map(p => getPoint(p.angle, v)).join(' ')} />
+        ))}
+        {/* Axes */}
+        {points.map(p => (
+          <line key={p.label} className="radar-axis" x1="50" y1="50" x2={getPoint(p.angle, 10).split(',')[0]} y2={getPoint(p.angle, 10).split(',')[1]} />
+        ))}
+        {/* Score Area */}
+        <polygon className="radar-area" points={areaPath} />
+      </svg>
+    </div>
+  );
+};
+
 function App() {
   // --- STATE ---
   const [candidates, setCandidates] = useState<any[]>([]);
@@ -203,14 +238,23 @@ function App() {
                 <div className="badge jd">JD Match: {c.current_assessment?.jd_match_score ? `${c.current_assessment.jd_match_score}%` : 'Unranked'}</div>
               </div>
               <p className="candidate-summary">{c.current_assessment?.summary || "Awaiting ranking for this role."}</p>
-              <div className="quirk-grid" style={{gridTemplateColumns: '1fr'}}>
-                {c.current_assessment?.quirk_scores ? Object.entries(c.current_assessment.quirk_scores).map(([k, v]: any) => (
-                  <div key={k} style={{fontSize: '0.8rem', borderBottom: '1px solid #f1f5f9', padding: '0.4rem 0'}}>
-                    <span style={{fontWeight: '700', textTransform: 'capitalize'}}>{k}: </span>
-                    <span>{v.reason} </span>
-                    <span style={{fontWeight: '800', color: 'var(--primary)'}}>{v.score}/10</span>
-                  </div>
-                )) : <span>No vibe data for this role.</span>}
+              
+              <div className="quirk-grid">
+                {c.current_assessment?.quirk_scores ? (
+                  <>
+                    <RadarChart scores={c.current_assessment.quirk_scores} />
+                    <div className="quirk-list">
+                      {Object.entries(c.current_assessment.quirk_scores).map(([k, v]: any) => (
+                        <div key={k} className="quirk-item">
+                          <span style={{fontWeight: '700', textTransform: 'capitalize', color: 'var(--text-muted)'}}>{k.replace('_', ' ')}</span>
+                          <span>{v.reason} <b style={{color: 'var(--primary)'}}>{v.score}/10</b></span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <span style={{color: 'var(--text-muted)', fontSize: '0.8rem'}}>No vibe data for this role.</span>
+                )}
               </div>
             </div>
           ))}
