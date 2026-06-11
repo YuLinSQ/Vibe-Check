@@ -30,62 +30,65 @@ app.post('/api/rank', async (req, res) => {
   try {
     const candidates = JSON.parse(fs.readFileSync(candidatesPath, 'utf8'));
     
-    // Using gemini-2.0-flash with a single batched call to avoid 429 rate limits
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
-      generationConfig: { responseMimeType: "application/json" }
-    });
+    let batchScores = null;
+    let apiError = null;
 
-    const candidatesListStr = candidates.map(c => `
-      ID: ${c.id}
-      Name: ${c.name}
-      Resume: ${c.resume}
-      Cover Letter: ${c.cover_letter}
-      LinkedIn: ${c.linkedin}
-      GitHub: ${c.github}
-    `).join("\n---Candidate Break---\n");
+    // List of models to try in order of preference
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
 
-    const prompt = `
-      You are an expert recruiter evaluating a batch of candidates for this specific job description:
-      "${jobDescription}"
+    if (apiKey && apiKey !== 'your_api_key_here') {
+      for (const modelName of modelsToTry) {
+        try {
+          console.log(`Attempting analysis with model: ${modelName}...`);
+          const model = genAI.getGenerativeModel({ 
+            model: modelName,
+            generationConfig: { responseMimeType: "application/json" }
+          });
 
-      Evaluate all of the following candidates at once. For each candidate, provide scores from 1 to 10 for these quirks:
-      - motivation: What drives them?
-      - stability: Likely to stay long-term?
-      - personality: Cultural fit and vibe.
-      - problem_approach: Analytical, creative, or brute-force?
-      - teamwork: Collaboration style.
+          const candidatesListStr = candidates.map(c => `
+            ID: ${c.id} Name: ${c.name} Resume: ${c.resume} Cover Letter: ${c.cover_letter}
+          `).join("\n---\n");
 
-      Also provide a "jd_match" score from 0-100 based on technical qualifications versus the job description.
-      Provide a brief 1-2 sentence "summary" of their vibe and fit.
+          const prompt = `Evaluate these candidates for: "${jobDescription}". Return a JSON array of objects with keys: id, name, motivation(1-10), stability(1-10), personality(1-10), problem_approach(1-10), teamwork(1-10), jd_match(0-100), summary(string). Candidates: ${candidatesListStr}`;
 
-      Candidates to evaluate:
-      ${candidatesListStr}
-
-      Return a JSON array containing objects matching this schema precisely:
-      [
-        {
-          "id": "string candidate ID",
-          "name": "string candidate name",
-          "motivation": number,
-          "stability": number,
-          "personality": number,
-          "problem_approach": number,
-          "teamwork": number,
-          "jd_match": number,
-          "summary": string
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          batchScores = JSON.parse(response.text());
+          console.log(`Successfully used model: ${modelName}`);
+          break; // Exit loop on success
+        } catch (err) {
+          console.error(`Model ${modelName} failed:`, err.message);
+          apiError = err.message;
+          // If it's a 429 or 404, we try the next model
         }
-      ]
-    `;
+      }
+    }
 
-    console.log("Sending batch request to Gemini API...");
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    const batchScores = JSON.parse(text);
+    // MOCK FALLBACK: If API fails or is missing, provide intelligent mock results
+    if (!batchScores) {
+      console.warn("Using Mock Fallback due to API issues:", apiError);
+      batchScores = candidates.map(c => {
+        // Simple heuristic for "mock" JD match
+        const jdKeywords = jobDescription.toLowerCase().split(/\W+/);
+        const resumeKeywords = c.resume.toLowerCase().split(/\W+/);
+        const matches = jdKeywords.filter(k => k.length > 4 && resumeKeywords.includes(k)).length;
+        const mockJD = Math.min(60 + (matches * 5), 98);
+
+        return {
+          id: c.id,
+          name: c.name,
+          motivation: 7 + Math.floor(Math.random() * 4),
+          stability: 6 + Math.floor(Math.random() * 5),
+          personality: 8 + Math.floor(Math.random() * 3),
+          problem_approach: 7 + Math.floor(Math.random() * 4),
+          teamwork: 7 + Math.floor(Math.random() * 4),
+          jd_match: mockJD,
+          summary: `[DEMO MODE] ${c.name} shows strong potential based on initial keyword matching. (API currently unavailable)`
+        };
+      });
+    }
 
     const totalWeight = Object.values(weights).reduce((a, b) => a + (b || 1), 0);
-
     const rankedCandidates = batchScores.map(quirkScores => {
       const candidateId = quirkScores.id;
       
