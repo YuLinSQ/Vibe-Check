@@ -1,0 +1,25 @@
+{
+  "name": "vibe-check",
+  "version": "1.0.0",
+  "description": "Compare basic qualifications via resume and job description match score, but also behavioral analysis based on weights on quirks provided by the user - sourced from cover letter, linkedin, and github - then rank candidates accordingly",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd backend && node server.js\" \"cd frontend && npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YuLinSQ/Vibe-Check.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/YuLinSQ/Vibe-Check/issues"
+  },
+  "homepage": "https://github.com/YuLinSQ/Vibe-Check#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
