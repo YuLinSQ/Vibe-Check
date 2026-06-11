@@ -29,8 +29,9 @@ app.post('/api/rank', async (req, res) => {
 
   try {
     const candidates = JSON.parse(fs.readFileSync(candidatesPath, 'utf8'));
+    // Using gemini-2.0-flash as it is available in your current API environment
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
       generationConfig: { responseMimeType: "application/json" }
     });
 
