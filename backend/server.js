@@ -15,142 +15,179 @@ app.use(bodyParser.json());
 const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
-app.post('/api/rank', async (req, res) => {
-  const { jobDescription, weights } = req.body;
-  console.log("Ranking request received:", { jobDescriptionLength: jobDescription?.length, weights });
-
-  if (!apiKey || apiKey === 'your_api_key_here') {
-    console.error("API Key is missing or default.");
-    return res.status(400).json({ error: "Gemini API key is not configured. Please add GOOGLE_API_KEY to your .env file." });
-  }
-
-  const candidatesPath = path.join(__dirname, '../data/candidates.json');
-  const rankingsPath = path.join(__dirname, '../data/rankings.json');
-
+// Helper to read/write JSON files safely
+const readJson = (file) => {
+  const filePath = path.join(__dirname, '../data', file);
+  if (!fs.existsSync(filePath)) return null;
   try {
-    const candidates = JSON.parse(fs.readFileSync(candidatesPath, 'utf8'));
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (e) {
+    return null;
+  }
+};
+
+const writeJson = (file, data) => {
+  const filePath = path.join(__dirname, '../data', file);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
+
+// --- API Endpoints ---
+
+app.get('/api/candidates', (req, res) => {
+  const data = readJson('candidates.json') || [];
+  res.json(data);
+});
+
+app.post('/api/candidates', (req, res) => {
+  const candidates = readJson('candidates.json') || [];
+  const newCand = { id: 'c' + Date.now(), ...req.body };
+  candidates.push(newCand);
+  writeJson('candidates.json', candidates);
+  res.status(201).json(newCand);
+});
+
+app.delete('/api/candidates/:id', (req, res) => {
+  let candidates = readJson('candidates.json') || [];
+  candidates = candidates.filter(c => c.id !== req.params.id);
+  writeJson('candidates.json', candidates);
+  res.status(204).send();
+});
+
+app.get('/api/jobs', (req, res) => {
+  const data = readJson('jobs.json') || [];
+  res.json(data);
+});
+
+app.post('/api/jobs', (req, res) => {
+  const jobs = readJson('jobs.json') || [];
+  const newJob = { id: String(jobs.length + 1).padStart(3, '0'), ...req.body };
+  jobs.push(newJob);
+  writeJson('jobs.json', jobs);
+  res.status(201).json(newJob);
+});
+
+app.get('/api/rankings', (req, res) => {
+  const data = readJson('rankings.json') || { jobId: null, candidates: [], isDemo: false };
+  res.json(data);
+});
+
+app.post('/api/rank', async (req, res) => {
+  const { jobDescription, weights, reAnalyzeAll, jobId } = req.body;
+  
+  try {
+    const candidates = readJson('candidates.json') || [];
     
-    let batchScores = null;
-    let apiError = null;
+    // 1. Determine who needs analysis
+    // For simplicity in this rewrite, we analyze based on the reAnalyzeAll flag
+    // or if they don't have scores for THIS specific job.
+    const needsAI = reAnalyzeAll 
+      ? candidates 
+      : candidates.filter(c => !c.quirk_scores || c.last_job_id !== jobId);
 
-    // List of models to try in order of preference
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    let apiResults = [];
+    let apiUsed = false;
 
-    if (apiKey && apiKey !== 'your_api_key_here') {
-      for (const modelName of modelsToTry) {
+    if (needsAI.length > 0 && apiKey && apiKey !== 'your_api_key_here') {
+      const models = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash-lite", "gemini-1.5-flash-latest"];
+      for (const m of models) {
         try {
-          console.log(`Attempting analysis with model: ${modelName}...`);
-          const model = genAI.getGenerativeModel({ 
-            model: modelName,
-            generationConfig: { responseMimeType: "application/json" }
-          });
-
-          const candidatesListStr = candidates.map(c => `
-            ID: ${c.id} Name: ${c.name} Resume: ${c.resume} Cover Letter: ${c.cover_letter}
-          `).join("\n---\n");
-
-          const prompt = `Evaluate these candidates for: "${jobDescription}". Return a JSON array of objects with keys: id, name, motivation(1-10), stability(1-10), personality(1-10), problem_approach(1-10), teamwork(1-10), jd_match(0-100), summary(string). Candidates: ${candidatesListStr}`;
-
+          console.log(`Trying model ${m}...`);
+          const model = genAI.getGenerativeModel({ model: m, generationConfig: { responseMimeType: "application/json" } });
+          const list = needsAI.map(c => `ID:${c.id} Name:${c.name} Resume:${c.resume} Letter:${c.cover_letter}`).join("\n---\n");
+          const prompt = `Rank these candidates for: "${jobDescription}". 
+          LOGIC: If JD match < 50, summary "Basic qualifications not met", all quirk scores=1, reasons="N/A".
+          Else full analysis.
+          Return a JSON array where each object has:
+          {
+            "id": string,
+            "jd_match": number (0-100),
+            "summary": string,
+            "motivation": {"score": number (1-10), "reason": string},
+            "stability": {"score": number (1-10), "reason": string},
+            "personality": {"score": number (1-10), "reason": string},
+            "problem_approach": {"score": number (1-10), "reason": string},
+            "teamwork": {"score": number (1-10), "reason": string}
+          }
+          Candidates: ${list}`;
+          
           const result = await model.generateContent(prompt);
-          const response = await result.response;
-          batchScores = JSON.parse(response.text());
-          console.log(`Successfully used model: ${modelName}`);
-          break; // Exit loop on success
-        } catch (err) {
-          console.error(`Model ${modelName} failed:`, err.message);
-          apiError = err.message;
-          // If it's a 429 or 404, we try the next model
+          apiResults = JSON.parse(result.response.text());
+          apiUsed = true;
+          break;
+        } catch (e) {
+          console.error(`${m} failed:`, e.message);
         }
       }
     }
 
-    // MOCK FALLBACK: If API fails or is missing, provide intelligent mock results
-    if (!batchScores) {
-      console.warn("Using Mock Fallback due to API issues:", apiError);
-      batchScores = candidates.map(c => {
-        // Simple heuristic for "mock" JD match
-        const jdKeywords = jobDescription.toLowerCase().split(/\W+/);
-        const resumeKeywords = c.resume.toLowerCase().split(/\W+/);
-        const matches = jdKeywords.filter(k => k.length > 4 && resumeKeywords.includes(k)).length;
-        const mockJD = Math.min(60 + (matches * 5), 98);
-
+    // 2. Fallback to Keyword Match
+    if (!apiUsed && needsAI.length > 0) {
+      console.warn("Using keyword fallback");
+      const jdWords = jobDescription.toLowerCase().split(/\W+/).filter(w => w.length > 5);
+      apiResults = needsAI.map(c => {
+        const resWords = c.resume.toLowerCase();
+        const matches = jdWords.filter(w => resWords.includes(w)).length;
+        const jdMatch = Math.min(60 + (matches * 5), 95);
+        const mock = (s) => ({ score: s, reason: "[NON-AI] Automated match." });
         return {
-          id: c.id,
-          name: c.name,
-          motivation: 7 + Math.floor(Math.random() * 4),
-          stability: 6 + Math.floor(Math.random() * 5),
-          personality: 8 + Math.floor(Math.random() * 3),
-          problem_approach: 7 + Math.floor(Math.random() * 4),
-          teamwork: 7 + Math.floor(Math.random() * 4),
-          jd_match: mockJD,
-          summary: `[DEMO MODE] ${c.name} shows strong potential based on initial keyword matching. (API currently unavailable)`
+          id: c.id, 
+          motivation: mock(5), stability: mock(5), personality: mock(5), problem_approach: mock(5), teamwork: mock(5),
+          jd_match: jdMatch,
+          summary: "[NON-AI] Assessment based on keyword overlap."
         };
       });
     }
 
-    const totalWeight = Object.values(weights).reduce((a, b) => a + (b || 1), 0);
-    const rankedCandidates = batchScores.map(quirkScores => {
-      const candidateId = quirkScores.id;
-      
-      // Calculate total score based on weights
-      const weightedQuirks = (
-        (quirkScores.motivation * (weights.motivation || 1)) +
-        (quirkScores.stability * (weights.stability || 1)) +
-        (quirkScores.personality * (weights.personality || 1)) +
-        (quirkScores.problem_approach * (weights.problem_approach || 1)) +
-        (quirkScores.teamwork * (weights.teamwork || 1))
-      ) / (totalWeight || 1);
-
-      const normalizedQuirks = weightedQuirks * 10;
-      const totalScore = (quirkScores.jd_match * 0.5) + (normalizedQuirks * 0.5);
-
-      return {
-        id: candidateId,
-        name: quirkScores.name,
-        total_score: Math.round(totalScore * 10) / 10,
-        jd_match_score: quirkScores.jd_match,
-        quirk_scores: {
-          motivation: quirkScores.motivation,
-          stability: quirkScores.stability,
-          personality: quirkScores.personality,
-          problem_approach: quirkScores.problem_approach,
-          teamwork: quirkScores.teamwork
-        },
-        summary: quirkScores.summary
-      };
+    // 3. Update master candidate list
+    const updatedCandidates = candidates.map(c => {
+      const result = apiResults.find(r => r.id === c.id);
+      if (result) {
+        return {
+          ...c,
+          quirk_scores: { 
+            motivation: result.motivation, 
+            stability: result.stability, 
+            personality: result.personality, 
+            problem_approach: result.problem_approach, 
+            teamwork: result.teamwork 
+          },
+          jd_match_score: result.jd_match,
+          summary: result.summary,
+          last_job_id: jobId
+        };
+      }
+      return c;
     });
+    writeJson('candidates.json', updatedCandidates);
 
-    const sortedRankings = rankedCandidates.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
-    fs.writeFileSync(rankingsPath, JSON.stringify(sortedRankings, null, 2));
-    res.json(sortedRankings);
+    // 4. Calculate Final Rankings
+    const totalWeight = Object.values(weights).reduce((a, b) => a + (b || 1), 0);
+    const ranked = updatedCandidates.map(c => {
+      if (c.last_job_id !== jobId || !c.quirk_scores) return { ...c, total_score: 0 };
+      
+      const q = c.quirk_scores;
+      // Extract numeric scores for math
+      const s = {
+        mot: q.motivation?.score || 1,
+        sta: q.stability?.score || 1,
+        per: q.personality?.score || 1,
+        pro: q.problem_approach?.score || 1,
+        tea: q.teamwork?.score || 1
+      };
+
+      const weightedVibe = ((s.mot * weights.motivation) + (s.sta * weights.stability) + (s.per * weights.personality) + (s.pro * weights.problem_approach) + (s.tea * weights.teamwork)) / totalWeight;
+      const total = Math.round(((c.jd_match_score * 0.5) + (weightedVibe * 5)) * 10) / 10;
+      return { ...c, total_score: total };
+    }).sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
+
+    const finalResult = { jobId, candidates: ranked, isDemo: !apiUsed };
+    writeJson('rankings.json', finalResult);
+    res.json(ranked);
 
   } catch (error) {
-    console.error("Critical ranking error during batch processing:", error);
-    res.status(500).json({ error: "Internal server error: " + error.message });
+    console.error("Critical Rank Error:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    apiKeyConfigured: !!(process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY)
-  });
-});
-
-app.get('/api/candidates', (req, res) => {
-  const candidatesPath = path.join(__dirname, '../data/candidates.json');
-  try {
-    if (!fs.existsSync(candidatesPath)) {
-      return res.status(404).json({ error: "candidates.json not found" });
-    }
-    const candidates = JSON.parse(fs.readFileSync(candidatesPath, 'utf8'));
-    res.json(candidates);
-  } catch (error) {
-    console.error("Error reading candidates:", error);
-    res.status(500).json({ error: "Could not read candidates data: " + error.message });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+app.listen(port, () => console.log(`Server ready on ${port}`));

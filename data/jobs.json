@@ -1,0 +1,12 @@
+[
+  {
+    "id": "001",
+    "title": "Intern Talent Engineer / Recruiting Operations",
+    "description": "What You'll Do\nRun sourcing as a pipeline: enrich, score, rank, and dedupe candidate batches instead of eyeballing lists.\nHelp build and maintain sourcing automation, from search to scoring to ranked output.\nQuery and maintain the internal talent graph and tooling using SQL and lightweight scripts.\nWire up Notion and Slack workflows for onsites, assessments, weekly updates, and pipeline tracking.\nShip small tools that remove repeated steps. The rule: if you do it twice by hand, you find a way to not do it a third time.\nHelp run candidate assessments and turn the outcomes into usable signal.\nKeep the system legible, so the next person can pick it up and run it.\n\nWhat You'll Bring\nA builder's instinct. You make things to make your own life easier. To solve real problems. Not because you saw a Linkedin post about it.\nOwnership. You take a problem start to finish without being managed through every step.\nLearning velocity. You pick up new tools fast and are not afraid of a blank terminal.\nSystems thinking. You see workflows, not one-off tasks, and ask how something scales before you ask how to finish it once.\nA bias toward shipping. A rough working version today beats a perfect plan next month.\nComfort with ambiguity. Instructions will sometimes be sparse. You fill the gaps with judgment, not paralysis.\nYou do not need a CS degree. Bonus if you have any of:\nSQL, Python, or JavaScript / Node\nNotion, Slack, or workflow automation experience\nComfort using AI tools to extend your own output\nPrior recruiting, ops, data, or sourcing exposure"
+  },
+  {
+    "id": "002",
+    "title": "test job",
+    "description": "this is a dummy job for testing"
+  }
+]

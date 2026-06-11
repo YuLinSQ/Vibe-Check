@@ -1,0 +1,66 @@
+{
+  "jobId": "001",
+  "candidates": [
+    {
+      "id": "c1",
+      "name": "Alex Rivera",
+      "resume": "Senior Software Engineer with 8 years of experience in React, Node.js, and AWS. Previously at TechCorp and InnovateSoft. Strong focus on performance optimization and system architecture.",
+      "cover_letter": "I am excited to apply for the Senior Engineer position. I love solving complex problems and believe in building tools that make a real difference. My experience at TechCorp taught me the importance of scalability.",
+      "linkedin": "Tech enthusiast. Building the future of web apps. 500+ connections.",
+      "github": "Frequent contributor to open-source UI libraries. Projects include a custom state management tool and a performance profiler.",
+      "quirk_scores": {
+        "motivation": "Enthusiastic about solving complex problems and building impactful tools, with a focus on scalability learned from previous experience.",
+        "stability": "8 years of experience, with past roles at TechCorp and InnovateSoft, suggesting moderate stability.",
+        "personality": "Proactive builder ('make things that make your own life easier'), ownership-oriented ('solving complex problems'), and systems-minded ('scalability').",
+        "problem_approach": "Focuses on building tools to solve real problems and emphasizes scalability, aligning with the job description's emphasis on automation and systems thinking.",
+        "teamwork": "Implied through collaboration in previous roles, but not explicitly stated."
+      },
+      "jd_match_score": 85,
+      "summary": "Strong candidate with relevant technical skills (React, Node.js, AWS) and a builder's instinct. Experience in performance optimization and system architecture aligns well with building automation and tools. Motivation for solving complex problems and making a difference is a great fit. JD match is high.",
+      "last_job_analyzed": "What You'll Do\nRun sourcing as a pipeline: enrich,...",
+      "last_job_id": "001",
+      "total_score": null
+    },
+    {
+      "id": "c2",
+      "name": "Sam Taylor",
+      "resume": "Mid-level Full Stack Developer. Skilled in Python, Django, and React. 3 years of experience. Boot camp graduate with a passion for clean code.",
+      "cover_letter": "I'm a fast learner looking to grow my career. I've been working on a few personal projects and am eager to join a collaborative team where I can contribute and learn.",
+      "linkedin": "Passionate developer looking for new opportunities.",
+      "github": "Personal portfolio and several small utility scripts.",
+      "quirk_scores": {
+        "motivation": "Eager to grow career, contribute, and learn within a collaborative team environment, highlighting a passion for clean code.",
+        "stability": "3 years of experience, recent boot camp graduate, indicating potential for growth but possibly lower stability.",
+        "personality": "Fast learner, passionate, and eager to join a collaborative team.",
+        "problem_approach": "Focuses on learning and contributing, with a potential bias toward shipping through personal projects, but less emphasis on automation or systems building.",
+        "teamwork": "Explicitly seeks a collaborative team environment."
+      },
+      "jd_match_score": 55,
+      "summary": "Candidate shows enthusiasm and a desire to learn. Technical skills (Python, React) are relevant but less extensive. Passion for clean code is good, but the focus on automation, systems thinking, and building tools is less apparent. JD match is moderate.",
+      "last_job_analyzed": "What You'll Do\nRun sourcing as a pipeline: enrich,...",
+      "last_job_id": "001",
+      "total_score": null
+    },
+    {
+      "id": "c3",
+      "name": "Jordan Lee",
+      "resume": "Lead Developer with 10+ years of experience. Expert in Java, Spring Boot, and Microservices. Lead teams of 10+ engineers.",
+      "cover_letter": "I am looking for a leadership role where I can mentor junior devs and drive technical strategy. I have a track record of delivering high-quality software on time.",
+      "linkedin": "Strategic thinker. Team leader. Tech visionary.",
+      "github": "Occasional contributions to enterprise-level frameworks.",
+      "quirk_scores": {
+        "motivation": "Seeking a leadership role to mentor junior developers and drive technical strategy, leveraging a track record of on-time delivery.",
+        "stability": "10+ years of experience and leadership roles suggest high stability.",
+        "personality": "Leadership-oriented, strategic, and results-driven.",
+        "problem_approach": "Focuses on technical strategy and delivering high-quality software, rather than building automation tools or optimizing workflows for personal efficiency, which is a key aspect of the JD.",
+        "teamwork": "Experience leading teams implies strong teamwork and mentoring capabilities."
+      },
+      "jd_match_score": 40,
+      "summary": "Overqualified for the core builder/automation aspects of the role. While experienced in leadership and software delivery, the JD emphasizes a 'builder's instinct' for automating tasks and creating internal tools, which is not the primary focus of this candidate's stated motivations. Basic qualifications not met.",
+      "last_job_analyzed": "What You'll Do\nRun sourcing as a pipeline: enrich,...",
+      "last_job_id": "001",
+      "total_score": null
+    }
+  ],
+  "isDemo": false
+}
