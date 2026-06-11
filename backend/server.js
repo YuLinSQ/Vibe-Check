@@ -50,13 +50,11 @@ app.delete('/api/candidates/:id', (req, res) => {
   candidates = candidates.filter(c => c.id !== req.params.id);
   writeJson('candidates.json', candidates);
   
-  // Also clean up rankings
   const rankings = readJson('rankings.json') || {};
   Object.keys(rankings).forEach(jobId => {
-    rankings[jobId] = (rankings[jobId] || []).filter(c => c.id !== req.params.id);
+    rankings[jobId].candidates = (rankings[jobId].candidates || []).filter(c => c.id !== req.params.id);
   });
   writeJson('rankings.json', rankings);
-  
   res.status(204).send();
 });
 
@@ -73,7 +71,6 @@ app.post('/api/jobs', (req, res) => {
 });
 
 app.get('/api/rankings', (req, res) => {
-  // Returns object { jobId1: [...], jobId2: [...] }
   res.json(readJson('rankings.json') || {});
 });
 
@@ -83,7 +80,7 @@ app.post('/api/rank', async (req, res) => {
   try {
     const candidates = readJson('candidates.json') || [];
     
-    // Determine who needs AI analysis for THIS specific job
+    // Check who needs AI
     const needsAI = reAnalyzeAll 
       ? candidates 
       : candidates.filter(c => !c.job_assessments || !c.job_assessments[jobId]);
@@ -111,7 +108,6 @@ app.post('/api/rank', async (req, res) => {
       }
     }
 
-    // Fallback if AI failed
     if (!apiUsed && needsAI.length > 0) {
       console.warn("Using keyword fallback");
       const jdWords = jobDescription.toLowerCase().split(/\W+/).filter(w => w.length > 5);
@@ -127,7 +123,7 @@ app.post('/api/rank', async (req, res) => {
       });
     }
 
-    // Update master candidate list with job-specific assessment
+    // UPDATE CANDIDATES.JSON (PERSIST TO job_assessments)
     const updatedCandidates = candidates.map(c => {
       const res = apiResults.find(r => r.id === c.id);
       if (res) {
@@ -137,13 +133,13 @@ app.post('/api/rank', async (req, res) => {
           jd_match_score: res.jd_match,
           summary: res.summary
         };
-        return { ...c, job_assessments: assessments };
+        return { ...c, job_assessments: assessments, last_job_id: jobId };
       }
       return c;
     });
     writeJson('candidates.json', updatedCandidates);
 
-    // Calculate rankings for THIS job
+    // CALCULATE RANKINGS FOR ALL (MERGE job_assessments[jobId] into top-level for result)
     const totalWeight = Object.values(weights).reduce((a, b) => a + (b || 1), 0);
     const ranked = updatedCandidates.map(c => {
       const assessment = c.job_assessments ? c.job_assessments[jobId] : null;
@@ -154,10 +150,17 @@ app.post('/api/rank', async (req, res) => {
       const weightedVibe = ((s.mot * weights.motivation) + (s.sta * weights.stability) + (s.per * weights.personality) + (s.pro * weights.problem_approach) + (s.tea * weights.teamwork)) / totalWeight;
       const total = Math.round(((assessment.jd_match_score * 0.5) + (weightedVibe * 5)) * 10) / 10;
       
-      return { ...c, total_score: total, current_assessment: assessment };
+      return { 
+        ...c, 
+        total_score: total, 
+        current_assessment: assessment,
+        // Also map these to top-level for compatibility with display components
+        quirk_scores: assessment.quirk_scores,
+        jd_match_score: assessment.jd_match_score,
+        summary: assessment.summary
+      };
     }).sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
 
-    // Update rankings.json (keyed by jobId)
     const allRankings = readJson('rankings.json') || {};
     allRankings[jobId] = { candidates: ranked, isDemo: !apiUsed };
     writeJson('rankings.json', allRankings);

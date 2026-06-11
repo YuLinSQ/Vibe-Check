@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
+const Logo = () => (
+  <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '12px' }}>
+    {/* Party Hat */}
+    <path d="M60 10 L75 35 L45 35 Z" fill="#ec4899" />
+    <circle cx="60" cy="8" r="3" fill="#fbcfe8" />
+    
+    {/* Balloon */}
+    <path d="M25 45 C 25 30, 45 30, 45 45 C 45 60, 25 60, 25 45" fill="#3b82f6" />
+    <path d="M35 55 L35 75" stroke="#94a3b8" strokeWidth="2" fill="none" />
+    
+    {/* Green Checkmark */}
+    <path d="M20 55 L40 75 L85 25" stroke="#10b981" strokeWidth="10" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 function App() {
   // --- STATE ---
   const [candidates, setCandidates] = useState<any[]>([]);
@@ -137,7 +152,10 @@ function App() {
       {loading && <div className="loading-overlay"><div className="spinner"></div><p>Ranking...</p></div>}
       
       <aside className="sidebar">
-        <h2>Vibe Check</h2>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <Logo />
+          <h2 style={{ margin: 0 }}>Vibe Check</h2>
+        </div>
         <input className="job-search-input" placeholder="Search jobs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
         <select value={selectedJobId} onChange={handleJobSelect}>
           <option value="">-- Select Job --</option>
