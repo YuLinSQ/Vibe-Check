@@ -51,11 +51,13 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jobDescription, weights })
       });
-      if (!response.ok) throw new Error('Failed to rank candidates');
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to rank candidates');
+      }
       setCandidates(data);
-    } catch (err) {
-      setError('Error ranking candidates. Make sure the backend is running and the API key is set.');
+    } catch (err: any) {
+      setError(err.message || 'Error ranking candidates. Make sure the backend is running and the API key is set.');
       console.error(err);
     } finally {
       setLoading(false);
